@@ -27,3 +27,6 @@ rn -rf [dir]
 
 #install all packages from requirements.txt
 pip install -r requirements.txt
+
+# terminate process with some ID
+kill 13123
