@@ -5,9 +5,9 @@ insert into `User` values(4, "Padon","Julian", "*********","Padon@gmail.com","qw
 insert into `User` values(5, "AdrianZP","Adrian", "Bilder","SubAndDub@gmail.com","all123","90121233123","photo.jpeg");
 SELECT * FROM movie_db.`User`;
 
-INSERT INTO `Movie` VALUES(1, "Matrix", "KianyRivs.jpeg","Psychological Movie about world","Kiany Rivs, Jennie Eshley","2:11:26");
+INSERT INTO `Movie` VALUES(1, "Matrix", "KianyRivs.jpeg","Psychological Movie about world","2:11:26","Kiany Rivs, Jennie Eshley");
 INSERT INTO `Movie` VALUES(2, "Matrix:Reboot", "KianyRivs.jpeg","Psychological Movie about world","Kiany Rivs, Jennie Eshley","2:11:26");
-INSERT INTO `Movie` VALUES(3, "Matrix:Last WAr:", "KianyRivs.jpeg","Psychological Movie about world","Kiany Rivs, Jennie Eshley","2:11:26");
+INSERT INTO `Movie` VALUES(3, "Matrix:Revolution", "KianyRivs.jpeg","Psychological Movie about world","Kiany Rivs, Jennie Eshley","2:11:26");
 SELECT * FROM movie_db.`Movie`;
 
 
@@ -44,3 +44,10 @@ INSERT INTO `Reservation` VALUES(1,"1999-03-14 12:53:42",1,1);
 INSERT INTO `Reservation` VALUES(2,"1999-03-14 12:53:42",1,2);
 INSERT INTO `Reservation` VALUES(3,"1999-03-14 12:53:42",1,4);
 SELECT * FROM movie_db.`Reservation`;
+
+DELETE FROM MovieSchedule
+WHERE id=9;
+
+
+
+
