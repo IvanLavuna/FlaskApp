@@ -19,23 +19,23 @@ CREATE TABLE `Movie`(
     picture		VARCHAR(30),
     info		TEXT,
     actors		TEXT,
-    duration    TIME NOT NULL
+    duration    VARCHAR(15) NOT NULL
 );
 
 CREATE TABLE `Reservation`( # updated
-	id            INT      PRIMARY KEY,
-	`date_time`	  DATETIME NOT NULL,
-    movie_id      INT      NOT NULL,
-    user_id       INT      NOT NULL,
+	id            INT         PRIMARY KEY,
+	`date_time`	  VARCHAR(20) NOT NULL,
+    movie_id      INT         NOT NULL,
+    user_id       INT         NOT NULL,
 	
 	FOREIGN KEY (movie_id) REFERENCES Movie(id),
 	FOREIGN KEY (user_id) REFERENCES `User`(id)
 );
 
-Create TABLE `MovieShedule`(
+Create TABLE `MovieSchedule`(
 	id   		INT PRIMARY KEY,
     movie_id	INT NOT NULL,
-    `date_time`	DATETIME NOT NULL,
+    `date_time`	VARCHAR(20) NOT NULL,
     
     FOREIGN KEY(movie_id) REFERENCES Movie(id)
 );
