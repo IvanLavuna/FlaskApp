@@ -64,3 +64,50 @@ alembic downgrade -1
 alembic upgrade ae10+2
 alembic current # view current revision
 alembic downgrade base # downgrade to base
+
+
+
+# curl
+# 1) DOWNLOAD a file
+curl -o vue-v2.6.10.js https://cdn.jsdelivr.net/npm/vue/dist/vue.js
+  # -> save the result into vue-v2.6.10.js
+curl -O vue-v2.6.10.js https://cdn.jsdelivr.net/npm/vue/dist/vue.js
+  # -> saces the file with its original filename
+
+# 2) Continue disconnected download
+curl -C - -O http://domain.com/file.tar.gz
+
+# 3) Download multiple files from different URLs
+xargs -n 1 curl -O < listurls.txt
+
+# 4) Create s POST request with parameter
+curl --data "firstName = John & lastName = Doe" http://localhost:4200/home
+
+# 5) see cookies which were downloaded from specified site
+curl --cookie-jar cnncookies.txt https://www.cnn.com/index.html -O
+
+# 6) send cookies
+curl --cookie cnncookies.txt https://www.cnn.com
+
+# 7) To prevent curl from using your bandwidth, you can limit the download speed to 100 KB / s, as shown below.
+curl --limit-rate 100K http://yourdomain.com/yourfile.tar.gz -O
+
+# 8) sending application/json data to server
+curl --header "Content-Type: application/json"   --request POST   --data '{"username":"xyz","password":"xyz"}'   http://localhost:4200/json-example
+
+# 9) sending application/json data to server from file
+curl -H "Content-Type: application/json" --data @./data/json/user.json http://localhost:4200/json-example
+
+# 10)
+curl -XGET http://localhost:4200/file
+
+# 11)
+curl -X POST -G 'http://localhost:5000/puppies' -d name=Ichigo+Men -d description=strong+and+ruddy
+# or
+curl -X POST -G 'http://localhost:5000/puppies?name=Ichigo+Men&description=strong+and+ruddy'
+
+~
+
+
+
+
