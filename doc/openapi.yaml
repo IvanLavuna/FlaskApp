@@ -24,6 +24,18 @@ paths:
         required: true
         schema:
           type: string
+      - name: firstname
+        in: query
+        description: Your real name
+        required: true
+        schema:
+          type: string
+      - name: lastname
+        in: query
+        description: Your real lastname
+        required: true
+        schema:
+          type: string
       - name: email
         in: query
         description: Your email
@@ -36,15 +48,18 @@ paths:
         required: true
         schema:
           type: string
-      - name: confirm password
+      - name: phone_number
         in: query
-        description: same as the password written before
-        required: true
+        description: Your phone number
+        required: false
         schema:
-          type: array
-          items:
-            type: string
-        
+          type: string
+      - name: photo
+        in: query
+        description: your photo
+        required: false
+        schema:
+          type: string
       summary: Creates account to user
       description: This can be done by anyone
       operationId: registerUser
@@ -57,10 +72,11 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad Request. Missing arguments
         '409':
           description: Conflict. Such email or username already exist
-        '5XX':
-          description: Unexpected error.
+
     
   /user/login:
     get:
@@ -69,12 +85,19 @@ paths:
       summary: Logs user into system
       operationId: loginUser
       parameters:
-      - name: username
+      - name: username # [one of items: username or email -  must be defined ]
         in: query
-        description: The user name for login
-        required: true
+        description: user's name for login
+        required: false
         schema:
           $ref: '#/components/schemas/User'
+      - name: email
+        in: query
+        description: user's email
+        required: false
+        schema:
+          $ref: '#/components/schemas/User'
+
       - name: password
         in: query
         description: The password for login in clear text
@@ -88,8 +111,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '400':
-          description: Invalid username/password supplied
+        '404':
+          description: Not found
+        '406':
+          description: Not acceptable
           content: {}
           
   /user/logout:
@@ -123,6 +148,20 @@ paths:
           type: integer
           items:
             $ref: '#/components/schemas/Reservation'
+      - name: userId
+        in: query
+        required: true
+        schema:
+          type: integer
+          items:
+            $ref: '#/components/schemas/Reservation'
+      - name: date_time
+        in: query
+        required: true
+        schema:
+          type: integer
+          items:
+            $ref: '#/components/schemas/Reservation'
       requestBody:
         content:
           application/json:
@@ -139,13 +178,15 @@ paths:
         '401':
           description: Invalid token.
         '400':
-          description: All places are already reserved.
+          description: Bad Request
+        '500':
+          description: All places are already reserved or no such date_time
           
   /movie:
     get:
       tags:
       - movie
-      summary: Returns currently coming out movies
+      summary: Returns all movies
       description: Option is available for not authorised users
       operationId: getMovies
       responses:
@@ -219,93 +260,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Movie'    
-        '409':
-          description: Conflict. Such movie already exist
-    
-
-    put:
-      tags:
-      - movie
-      security:
-        - bearer: [admin]
-      summary: Update movie
-      description: This can only be done by admin
-      operationId: updateMovie
-      parameters:
-      - name: movieId
-        in: query
-        description: Id of movie that need to be updated
-        required: true
-        schema:
-          type: integer
-      
-      - name: picture
-        in: query
-        description: Photo of movie
-        required: false
-        schema:
-          type: string
-          
-      - name: info
-        in: query
-        description: Time information of movie
-        required: false
-        schema:
-          type: string
-      
-      - name: duration
-        in: query
-        description: Time information of movie
-        required: false
-        schema:
-          type: string
-      requestBody:
-        description: Updated movie object
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/Movie'
-        required: true
-        
-      responses:
-        '201':
-          description: Movie is successfully updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Movie'    
         '400':
-          description: Invalid movie Id supplied
-        '404':
-          description: Movie not found
+          description: Bad Request. Missing arguments
 
-    delete:
-      tags:
-      - movie
-      security:
-        - bearer: [admin]
-      summary: Delete movie
-      description: This can only be done by admin
-      operationId: deleteMovie
-      parameters:
-      - name: movieId
-        in: query
-        description: The movie that needs to be deleted
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: Opearation is succesuful
-        '400':
-          description: Invalid movie ID supplied
-          content: {}
-        '404':
-          description: Movie not found
-          content: {}
-          
-
-  /movie/{movieID}:
+  /movie/{id}:
     get:
       tags:
       - movie
@@ -314,7 +272,7 @@ paths:
       operationId: getMovieById
       
       parameters:
-      - name: movieID
+      - name: id
         in: path
         description: Id of specified movie
         required: true
@@ -332,32 +290,144 @@ paths:
                   $ref: '#/components/schemas/Movie'
         '404':
           description: Not found 
-          
-  /movie/Shedule:
+    put:
+      tags:
+        - movie
+      security:
+        - bearer: [ admin ]
+      summary: Update movie
+      description: This can only be done by admin
+      operationId: updateMovie
+      parameters:
+        - name: id
+          in: path
+          description: Id of movie that need to be updated
+          required: true
+          schema:
+            type: integer
+
+        - name: name
+          in: query
+          description: Name of movie
+          required: false
+          schema:
+            type: string
+
+        - name: picture
+          in: query
+          description: Photo of movie
+          required: false
+          schema:
+            type: string
+
+        - name: info
+          in: query
+          description: Time information of movie
+          required: false
+          schema:
+            type: string
+
+        - name: actors
+          in: query
+          description: Actors of movie
+          required: false
+          schema:
+            type: string
+
+        - name: duration
+          in: query
+          description: Time information of movie
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Updated movie object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/Movie'
+        required: true
+
+      responses:
+        '201':
+          description: Movie is successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Movie was not found
+
+    delete:
+      tags:
+        - movie
+      security:
+        - bearer: [ admin ]
+      summary: Delete movie
+      description: This can only be done by admin
+      operationId: deleteMovie
+      parameters:
+        - name: id
+          in: path
+          description: The movie that needs to be deleted
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Opearation is succesuful
+        '404':
+          description: Movie not found
+
+  /movie/schedule:
+    get:
+      tags:
+      - movie
+      summary: Returns all affiche schedule
+      description: Option is available for not authorised users
+      operationId: getSchedule
+      responses:
+        '200':
+          description: all is ok.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        '401':
+          description: Token not valid.
     post:
       tags:
       - movie
       security:
         - bearer: [admin]
-      summary: Add some movie into schedule
+      summary: Add some movie in affiche in specified day and time
       description: Oppearation is allowed only for admin
       operationId: addNewMovieToAffiche
      
       parameters:
-      - name: movieId
+      - name: movie_id
         in: query
         description: Id of Movie
         required: true
         schema:
           $ref: '#/components/schemas/MovieSchedule'
       
-      - name: date_time
+      - name: date
         in: query
-        description: date and time of movie
+        description: date of movie
         required: true
         schema:
           $ref: '#/components/schemas/MovieSchedule'
-      
+
+      - name: time
+        in: query
+        description: time of movie
+        required: true
+        schema:
+          $ref: '#/components/schemas/MovieSchedule'
+
       requestBody:
         description: Updated user object
         content:
@@ -372,77 +442,114 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MovieSchedule'
+        '400':
+          description: Bad Request. Missing arguments
         '409':
-          description: Conflict. Specified movieID or date time is alredy exist
+          description: Conflict. Date and time is already exist
         '404':
-          description: Not found 
+          description: Specified movie id was not found
 
-    put:
+  /movie/schedule/{id}:
+    get:
       tags:
       - movie
-      security:
-        - bearer: [admin]
-      summary: Update movie schedule
-      description: This can only be done by admin
-      operationId: updateMovieSchedule
-      parameters:
-      - name: movieId
-        in: query
-        description: Id of movie that need to be updated
-        required: true
-        schema:
-          $ref: '#/components/schemas/MovieSchedule'
-      - name: date_time
-        in: query
-        description: date and time of movie
-        required: true
-        schema:
-          $ref: '#/components/schemas/MovieSchedule'
+      summary: Returns schedule by id
+      description: Oppearation is allowed for anyone
+      operationId: getScheduleById
 
-      requestBody:
-        description: Updated movie object
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/MovieSchedule'
+      parameters:
+      - name: id
+        in: path
+        description: Id of specified schedule
         required: true
-        
+        schema:
+          type: integer
+
       responses:
-        '201':
-          description: Schedule of movie is successfule updated
+        '200':
+          description: Specified schedule is found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Movie'    
-        '400':
-          description: Invalid movie ID supplied
+                type: array
+                items:
+                  $ref: '#/components/schemas/MovieSchedule'
         '404':
-          description: Movie was not found
+          description: Not found
+    put:
+      tags:
+        - movie
+      security:
+        - bearer: [ admin ]
+      summary: Update Movie schedule
+      description: This can only be done by admin
+      operationId: updateMovie
+      parameters:
+        - name: id
+          in: path
+          description: Id of movie that need to be updated
+          required: true
+          schema:
+            type: integer
+
+        - name: movie_id
+          in: query
+          description: movie id
+          required: false
+          schema:
+            type: string
+
+        - name: date
+          in: query
+          description: date of movie
+          required: false
+          schema:
+            type: string
+
+        - name: time
+          in: query
+          description: time of movie
+          required: false
+          schema:
+            type: string
+      requestBody:
+        description: Updated movie schedule
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/MovieSchedule'
+        required: true
+
+      responses:
+        '201':
+          description: Movie schedule was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieSchedule'
+        '404':
+          description: Movie Schedule was not found
 
     delete:
       tags:
-      - movie
+        - movie
       security:
-        - bearer: [admin]
-      summary: Delete some movie from schedule
+        - bearer: [ admin ]
+      summary: Delete schedule of some movie
       description: This can only be done by admin
-      operationId: deleteMovieFromAffiche
+      operationId: deleteMovieSchedule
       parameters:
-      - name: movieId
-        in: query
-        description: The movie that needs to be deleted
-        required: true
-        schema:
-          type: string
+        - name: id
+          in: path
+          description: The movie schedule id that needs to be deleted
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: Opearation is succesuful
-        '400':
-          description: Invalid movieId supplied
-          content: {}
         '404':
-          description: Movie not found
-          content: {}
+          description: Movie Schedule was not found
 
 
 components:
@@ -525,17 +632,22 @@ components:
       properties:
         id:
           type: integer
-        date_time:
+        date:
           type: string
-          format: date-time
-          example: '2021-03-18 14:55:00'
+          format: date
+          example: '2021-03-18'
+        time:
+          type: string
+          format: time
+          example: '14:55:00'
         movie_id:
           $ref: '#/components/schemas/Movie'
         user_id:
           $ref: '#/components/schemas/User'
       required:
         - id
-        - date_time
+        - date
+        - time
         - movie_id
         - user_id
     
@@ -545,13 +657,17 @@ components:
           type: integer
         movie_id:
           $ref: '#/components/schemas/Movie'
-        date_time:
+        date:
           type: string
-          format: date-time
+          format: date
+        time:
+          type: string
+          format: time
       required:
         - id
         - movie_id
-        - date-time
+        - date
+        - time
           
       
         

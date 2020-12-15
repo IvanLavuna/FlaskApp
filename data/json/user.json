@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "code": 406, 
+    "message": "Invalid data supplied", 
+    "type": "Not acceptable"
+  }
+}
